@@ -6,6 +6,7 @@
 
 namespace m2d
 {
+    unsigned long long hashFunc(std::string _toHash, unsigned long long _hashbase, unsigned long long _hashmod);
     class SpriteSheet
     {
         private:
@@ -14,13 +15,14 @@ namespace m2d
             unsigned int spritecount;
             std::vector<Texture> textures;
             std::vector<bool> loaded;
-            std::map<long long, int> spritehash;
+            unsigned int hashmodind = 0;
+            std::vector<unsigned int> hashbases = {733, 739, 743, 751, 757};
+            void loadTexture(unsigned int _no);
         public:
             SpriteSheet();
             SpriteSheet(std::string _filename, Vector2u _sprsize);
             Vector2u getSize();
             Vector2u getSprsize();
-            void loadTexture(unsigned int _no);
             Texture& getTexture(unsigned int _no);
     };
 }
