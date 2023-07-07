@@ -13,7 +13,7 @@ using std::vector;
 using sf::Vector2u;
 namespace msim
 {
-    bool between(int x, int l, int r);
+    bool between(int in_x, int in_l, int in_r);
     vector<Vector2u> neighbours4(Vector2u pos, Vector2u dimensions);
     vector<Vector2u> neighbours8(Vector2u pos, Vector2u dimensions);
     struct qupdate
@@ -36,13 +36,13 @@ namespace msim
         std::queue<qupdate> updates;
         sf::RenderWindow* dishwindow;
         std::mt19937 rng;
-        void (*cellproc)(cell c, Vector2u pos);
+        void (*cellproc)(cell in_c, Vector2u in_pos);
     public:
-        cell& get_cell(Vector2u coords);
+        cell& get_cell(Vector2u in_coords);
         unsigned int randnum();
-        void addtask(qupdate qup);
-        PetriDish(std::string in_spritesheetname, Vector2u in_spritesize, Vector2u in_dimensions, void (*in_cellproc)(cell c, Vector2u pos)); //TODO: alternate constructor that allows for passing an existing spritesheet
-        void activate(vector<vector<unsigned int> > &initialdish, unsigned int mstickrate);
+        void addtask(qupdate in_qup);
+        PetriDish(std::string in_spritesheetname, Vector2u in_spritesize, Vector2u in_dimensions, void (*in_cellproc)(cell in_c, Vector2u in_pos)); //TODO: alternate constructor that allows for passing an existing spritesheet
+        void activate(vector<vector<unsigned int> > &initialdish, unsigned int in_mstickrate);
     };
 }
 #endif
