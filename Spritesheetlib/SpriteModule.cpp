@@ -2,6 +2,7 @@
 #define SPRITEMODULE_H
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <fstream>
 namespace m2d
 {
     using sf::Texture, sf::Image, sf::Sprite, sf::Vector2u, sf::IntRect;
@@ -25,6 +26,7 @@ namespace m2d
             std::vector<bool> loaded;
             unsigned int hashmodind = 0;
             std::vector<unsigned int> hashbases = {733, 739, 743, 751, 757};
+            std::map<unsigned long long, int> _dictionary;
             void loadTexture(unsigned int _no)
             {
                 loaded[_no] = true;
@@ -33,6 +35,38 @@ namespace m2d
                 unsigned int _row = _no / _columns;
                 unsigned int _x(_column * spritesize.x), _y(_row * spritesize.y);
                 textures[_no].loadFromImage(sheet, sf::IntRect(_x, _y, spritesize.x, spritesize.y));
+            }
+            void initDictionary(std::string _dictionaryfilename)
+            {
+                std::vector<std::string> _names;
+                std::string _in;
+                std::ifstream _dictionaryinput(_dictionaryfilename);
+                while(_dictionaryinput>>_in)
+                {
+                    _names.push_back(_in);
+                }
+                for(unsigned int _curbase : hashbases)
+                {
+                    unsigned int counter = 0;
+                    _dictionary.clear();
+                    bool good = true;
+                    for(std::string _s : _names)
+                    {
+                        long long _wordhash = hashFunc(_s, _curbase, 1000000007);
+                        if(_dictionary.find(_wordhash) != _dictionary.end())
+                        {
+                            good = false;
+                            break;
+                        }
+                        _dictionary.insert({_wordhash, counter});
+                        counter++;
+                    }
+                    if(good)
+                    {
+                        break;
+                    }
+                    hashmodind++;
+                }
             }
         public:
             SpriteSheet();
@@ -44,6 +78,11 @@ namespace m2d
                 textures.resize(spritecount);
                 loaded.resize(spritecount);
                 std::fill(loaded.begin(), loaded.end(), 0);
+            }
+            SpriteSheet(std::string _imagefilename, Vector2u _sprsize, std::string _dictionaryfilename)
+            {
+                SpriteSheet(_imagefilename, _sprsize);
+                initDictionary(_dictionaryfilename);
             }
             Vector2u getSize()
             {
@@ -60,6 +99,10 @@ namespace m2d
                     loadTexture(_no);
                 }
                 return textures[_no];
+            }
+            Texture& getTexture(std::string _name)
+            {
+                return getTexture(_dictionary[hashFunc(_name, hashbases[hashmodind], 1000000007)]);
             }
     };
 }
