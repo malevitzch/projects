@@ -5,104 +5,103 @@
 #include <fstream>
 namespace m2d
 {
-    using sf::Texture, sf::Image, sf::Sprite, sf::Vector2u, sf::IntRect;
-    unsigned long long hashFunc(std::string _tohash, unsigned long long _hashbase, unsigned long long _hashmod)
+    unsigned long long hashFunc(std::string to_hash, unsigned long long hash_base, unsigned long long hash_mod)
     {
-        unsigned long long _hash = 0;
-        for(char _c : _tohash)
+        unsigned long long cur_hash = 0;
+        for(char c : to_hash)
         {
-            _hash = (_hash + _c) % _hashmod;
-            _hash = (_hash * _hashbase) % _hashmod;
+            cur_hash = (cur_hash + c) % hash_mod;
+            cur_hash = (cur_hash * hash_base) % hash_mod;
         }
-        return _hash;
+        return cur_hash;
     }
     class SpriteSheet
     {
         private:
-            Vector2u spritesize;
-            Image sheet;
-            unsigned int spritecount;
-            std::vector<Texture> textures;
+            sf::Vector2u sprite_size;
+            sf::Image sheet;
+            unsigned int sprite_count;
+            std::vector<sf::Texture> textures;
             std::vector<bool> loaded;
-            unsigned int hashmodind = 0;
-            std::vector<unsigned int> hashbases = {733, 739, 743, 751, 757};
-            std::map<unsigned long long, int> _dictionary;
-            void loadTexture(unsigned int _no)
+            unsigned int hash_base_index = 0;
+            std::vector<unsigned int> hash_bases = {733, 739, 743, 751, 757};
+            std::map<unsigned long long, int> dictionary;
+            void loadTexture(unsigned int index)
             {
-                loaded[_no] = true;
-                unsigned int _columns = getSize().x / spritesize.x; //can be done with a lot less math
-                unsigned int _column = _no % _columns;
-                unsigned int _row = _no / _columns;
-                unsigned int _x(_column * spritesize.x), _y(_row * spritesize.y);
-                textures[_no].loadFromImage(sheet, sf::IntRect(_x, _y, spritesize.x, spritesize.y));
+                loaded[index] = true;
+                unsigned int columns = sheet.getSize().x / sprite_size.x;
+                unsigned int column = index % columns;
+                unsigned int row = index / columns;
+                unsigned int x(index * sprite_size.x), y(row * sprite_size.y);
+                textures[index].loadFromImage(sheet, sf::IntRect(x, y, sprite_size.x, sprite_size.y));
             }
-            void initDictionary(std::string _dictionaryfilename)
+            void initDictionary(std::string dictionary_file_name)
             {
-                std::vector<std::string> _names;
-                std::string _in;
-                std::ifstream _dictionaryinput(_dictionaryfilename);
-                while(_dictionaryinput>>_in)
+                std::vector<std::string> names;
+                std::string in;
+                std::ifstream dictionary_input(dictionary_file_name);
+                while(dictionary_input>>in)
                 {
-                    _names.push_back(_in);
+                    names.push_back(in);
                 }
-                for(unsigned int _curbase : hashbases)
+                for(unsigned int cur_base : hash_bases)
                 {
                     unsigned int counter = 0;
-                    _dictionary.clear();
-                    bool good = true;
-                    for(std::string _s : _names)
+                    dictionary.clear();
+                    bool is_collision = false;
+                    for(std::string s : names)
                     {
-                        long long _wordhash = hashFunc(_s, _curbase, 1000000007);
-                        if(_dictionary.find(_wordhash) != _dictionary.end())
+                        long long word_hash = hashFunc(s, cur_base, 1000000007);
+                        if(dictionary.find(word_hash) != dictionary.end())
                         {
-                            good = false;
+                            is_collision = true;
                             break;
                         }
-                        _dictionary.insert({_wordhash, counter});
+                        dictionary.insert({word_hash, counter});
                         counter++;
                     }
-                    if(good)
+                    if(!is_collision)
                     {
                         break;
                     }
-                    hashmodind++;
+                    hash_base_index++;
                 }
             }
         public:
             SpriteSheet();
-            SpriteSheet(std::string _filename, sf::Vector2u _sprsize)
+            SpriteSheet(std::string file_name, sf::Vector2u sprsize)
             {
-                sheet.loadFromFile(_filename);
-                spritesize = _sprsize;
-                spritecount = (sheet.getSize().x / spritesize.x) * (sheet.getSize().y / spritesize.y);
-                textures.resize(spritecount);
-                loaded.resize(spritecount);
+                sheet.loadFromFile(file_name);
+                sprite_size = sprsize;
+                sprite_count = (sheet.getSize().x / sprite_size.x) * (sheet.getSize().y / sprite_size.y);
+                textures.resize(sprite_count);
+                loaded.resize(sprite_count);
                 std::fill(loaded.begin(), loaded.end(), 0);
             }
-            SpriteSheet(std::string _imagefilename, Vector2u _sprsize, std::string _dictionaryfilename)
+            SpriteSheet(std::string image_file_name, sf::Vector2u in_sprsize, std::string dictionary_file_name)
             {
-                SpriteSheet(_imagefilename, _sprsize);
-                initDictionary(_dictionaryfilename);
+                SpriteSheet(image_file_name, in_sprsize);
+                initDictionary(dictionary_file_name);
             }
-            Vector2u getSize()
+            sf::Vector2u getSize()
             {
                 return sheet.getSize();
             }
-            Vector2u getSprsize()
+            sf::Vector2u getSprsize()
             {
-                return spritesize;
+                return sprite_size;
             }
-            Texture& getTexture(unsigned int _no) //TODO: add error handling when reading out of bounds or from uninitialized spritesheet
+            sf::Texture& getTexture(unsigned int index) //TODO: add error handling when reading out of bounds or from uninitialized spritesheet
             {
-                if(!loaded[_no])
+                if(!loaded[index])
                 {
-                    loadTexture(_no);
+                    loadTexture(index);
                 }
-                return textures[_no];
+                return textures[index];
             }
-            Texture& getTexture(std::string _name)
+            sf::Texture& getTexture(std::string name)
             {
-                return getTexture(_dictionary[hashFunc(_name, hashbases[hashmodind], 1000000007)]);
+                return getTexture(dictionary[hashFunc(name, hash_bases[hash_base_index], 1000000007)]);
             }
     };
 }

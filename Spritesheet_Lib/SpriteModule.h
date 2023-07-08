@@ -6,28 +6,28 @@
 #include <fstream>
 namespace m2d
 {
-    unsigned long long hashFunc(std::string _toHash, unsigned long long _hashbase, unsigned long long _hashmod);
+    unsigned long long hashFunc(std::string to_hash, unsigned long long hash_base, unsigned long long hash_mod);
     class SpriteSheet
     {
         private:
-            Vector2u spritesize;
+            Vector2u sprite_size;
             Image sheet;
-            unsigned int spritecount;
+            unsigned int sprite_count;
             std::vector<Texture> textures;
             std::vector<bool> loaded;
-            unsigned int hashmodind = 0;
-            std::vector<unsigned int> hashbases = {733, 739, 743, 751, 757};
-            std::map<unsigned long long, int> _dictionary;
-            void loadTexture(unsigned int _no);
-            void initDictionary(std::string _disctionaryfilename);
+            unsigned int hash_base_index;
+            std::vector<unsigned int> hash_bases;
+            std::map<unsigned long long, int> dictionary;
+            void loadTexture(unsigned int index);
+            void initDictionary(std::string dictionary_file_name);
         public:
             SpriteSheet();
-            SpriteSheet(std::string _filename, Vector2u _sprsize);
-            SpriteSheet(std::string _imagefilename, Vector2u _sprsize, std::string _dictionaryfilename);
-            Vector2u getSize();
-            Vector2u getSprsize();
-            Texture& getTexture(unsigned int _no);
-            Texture& getTexture(std::string _name);
+            SpriteSheet(std::string file_name, sf::Vector2u sprsize);
+            SpriteSheet(std::string image_file_name, sf::Vector2u _sprsize, std::string dictionary_file_name);
+            sf::Vector2u getSize();
+            sf::Vector2u getSprsize();
+            sf::Texture& getTexture(unsigned int index);
+            sf::Texture& getTexture(std::string name);
     };
 }
 #endif
