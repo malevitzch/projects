@@ -100,11 +100,11 @@ namespace m2d
             }
             addTask(pos, sprite_sheet->getTileIndex(type_name));
         }
-        PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos))
+        PetriDish(SpriteSheet *in_sprite_sheet, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos))
         {
             dimensions = in_dimensions;
             cellProc = in_cellProc;
-            sprite_sheet = new SpriteSheet(sprite_sheet_name, in_spritesize);
+            sprite_sheet = in_sprite_sheet;
             cells.resize(dimensions.x);
             for(std::vector<cell> &cv : cells)
             {
@@ -118,6 +118,14 @@ namespace m2d
                 }
             }
             rng.seed(std::time(NULL));
+        }
+        PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos))
+        {
+            PetriDish(new SpriteSheet(sprite_sheet_name, in_spritesize), in_dimensions, in_cellProc);
+        }
+        PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, std::string in_dictionary_name, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos))
+        {
+            PetriDish(new SpriteSheet(sprite_sheet_name, in_spritesize, in_dictionary_name), in_dimensions, in_cellProc);
         }
         void init(std::vector<std::vector<unsigned int> > &initial_dish, unsigned int ms_tickrate)
         {
