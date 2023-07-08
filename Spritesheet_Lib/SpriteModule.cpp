@@ -67,9 +67,7 @@ namespace m2d
                     hash_base_index++;
                 }
             }
-        public:
-            SpriteSheet();
-            SpriteSheet(std::string file_name, sf::Vector2u sprsize)
+            void objectInit(std::string file_name, sf::Vector2u sprsize)
             {
                 sheet.loadFromFile(file_name);
                 sprite_size = sprsize;
@@ -78,9 +76,15 @@ namespace m2d
                 loaded.resize(sprite_count);
                 std::fill(loaded.begin(), loaded.end(), 0);
             }
+        public:
+            SpriteSheet();
+            SpriteSheet(std::string file_name, sf::Vector2u sprsize)
+            {
+                objectInit(file_name, sprsize);
+            }
             SpriteSheet(std::string image_file_name, sf::Vector2u in_sprsize, std::string dictionary_file_name)
             {
-                SpriteSheet(image_file_name, in_sprsize);
+                objectInit(image_file_name, in_sprsize);
                 initDictionary(dictionary_file_name);
             }
             sf::Vector2u getSize()

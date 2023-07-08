@@ -20,6 +20,7 @@ namespace m2d
             std::map<unsigned long long, int> dictionary;
             void loadTexture(unsigned int index);
             void initDictionary(std::string dictionary_file_name);
+            void objectInit(std::string file_name, sf::Vector2u sprsize);
         public:
             SpriteSheet();
             SpriteSheet(std::string file_name, sf::Vector2u sprsize);
