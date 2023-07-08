@@ -7,3 +7,4 @@ It is important to note that some project might be depended upon others so movin
 - [ ] Add ABOUT file to Petri_Dish
 - [ ] Isometric Renderer
 - [ ] Add documentation to header files
+- [ ] Word mistyping project
