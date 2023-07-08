@@ -41,6 +41,7 @@ namespace m2d
         sf::RenderWindow* dish_window;
         std::mt19937 rng;
         void (*cellProc)(cell c, sf::Vector2u pos);
+        void objectInit(SpriteSheet* in_sprite_sheet, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos));
     public:
         cell& getCell(sf::Vector2u coords);
         unsigned int randnum();

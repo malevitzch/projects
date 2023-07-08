@@ -79,8 +79,27 @@ namespace m2d
         sf::RenderWindow* dish_window;
         std::mt19937 rng;
         void (*cellProc)(cell c, sf::Vector2u pos);
+        void objectInit(SpriteSheet *in_sprite_sheet, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos))
+        {
+            dimensions = in_dimensions;
+            cellProc = in_cellProc;
+            sprite_sheet = in_sprite_sheet;
+            cells.resize(dimensions.x);
+            for(std::vector<cell> &cv : cells)
+            {
+                cv.resize(dimensions.y);
+            }
+            for(unsigned int i = 0; i < dimensions.x; i++)
+            {
+                for(unsigned int j = 0; j < dimensions.y; j++)
+                {
+                    tiles.push_back({i, j});
+                }
+            }
+            rng.seed(std::time(NULL));
+        }
     public:
-        cell& get_cell(sf::Vector2u coords)
+        cell& getCell(sf::Vector2u coords)
         {
             return cells[coords.x][coords.y];
         }
@@ -100,32 +119,19 @@ namespace m2d
             }
             addTask(pos, sprite_sheet->getTileIndex(type_name));
         }
-        PetriDish(SpriteSheet *in_sprite_sheet, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos))
+        PetriDish(SpriteSheet* in_sprite_sheet, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos))
         {
-            dimensions = in_dimensions;
-            cellProc = in_cellProc;
-            sprite_sheet = in_sprite_sheet;
-            cells.resize(dimensions.x);
-            for(std::vector<cell> &cv : cells)
-            {
-                cv.resize(dimensions.y);
-            }
-            for(unsigned int i = 0; i < dimensions.x; i++)
-            {
-                for(unsigned int j = 0; j < dimensions.y; j++)
-                {
-                    tiles.push_back({i, j});
-                }
-            }
-            rng.seed(std::time(NULL));
+            objectInit(in_sprite_sheet, in_dimensions, in_cellProc);
         }
         PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos))
         {
-            PetriDish(new SpriteSheet(sprite_sheet_name, in_spritesize), in_dimensions, in_cellProc);
+            SpriteSheet* new_sprite_sheet = new SpriteSheet(sprite_sheet_name, in_spritesize);
+            objectInit(new_sprite_sheet, in_dimensions, in_cellProc);
         }
         PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, std::string in_dictionary_name, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos))
         {
-            PetriDish(new SpriteSheet(sprite_sheet_name, in_spritesize, in_dictionary_name), in_dimensions, in_cellProc);
+            SpriteSheet* new_sprite_sheet = new SpriteSheet(sprite_sheet_name, in_spritesize, in_dictionary_name);
+            objectInit(new_sprite_sheet, in_dimensions, in_cellProc);
         }
         void init(std::vector<std::vector<unsigned int> > &initial_dish, unsigned int ms_tickrate)
         {
@@ -144,23 +150,13 @@ namespace m2d
                 sf::Event event;
                 while(dish_window->pollEvent(event))
                 {
+
                     if (event.type == sf::Event::Closed)
                     {
                         dish_window->close();
                     }
                 }
-                for(sf::Vector2u cur_tile : tiles)
-                {
-                    cellProc(cells[cur_tile.x][cur_tile.y], cur_tile);
-                }
-                while(!updates.empty())
-                {
-                    cell &c = cells[updates.front().pos.x][updates.front().pos.y];
-                    c.tile_type = updates.front().value;
-                    updates.pop();
-                }
                 dish_window->clear();
-                std::shuffle(tiles.begin(), tiles.end(), rng);
                 for(sf::Vector2u cur_tile : tiles)
                 {
                     cell &c = cells[cur_tile.x][cur_tile.y];
@@ -168,6 +164,18 @@ namespace m2d
                     dish_window->draw(c.sprite);
                 }
                 dish_window->display();
+                for(sf::Vector2u cur_tile : tiles)
+                {
+                    cellProc(cells[cur_tile.x][cur_tile.y], cur_tile);
+                }
+
+                while(!updates.empty())
+                {
+                    cell &c = cells[updates.front().pos.x][updates.front().pos.y];
+                    c.tile_type = updates.front().value;
+                    updates.pop();
+                }
+                std::shuffle(tiles.begin(), tiles.end(), rng);
                 std::this_thread::sleep_for(ms_tickrate * 1ms);
             }
 
