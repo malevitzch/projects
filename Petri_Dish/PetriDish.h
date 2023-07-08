@@ -22,7 +22,8 @@ namespace m2d
     struct qupdate
     {
         sf::Vector2u pos;
-        unsigned int value;
+        unsigned int index;
+        string name;
     };
     struct cell
     {
@@ -36,7 +37,7 @@ namespace m2d
         std::vector<Vector2u> tiles;
         SpriteSheet* sprite_sheet;
         sf::Vector2u dimensions;
-        std::queue<qupdate> updates;
+        std::queue<qupdate*> updates;
         sf::RenderWindow* dish_window;
         std::mt19937 rng;
         void (*cellProc)(cell c, sf::Vector2u pos);

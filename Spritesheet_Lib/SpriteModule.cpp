@@ -91,6 +91,14 @@ namespace m2d
             {
                 return sprite_size;
             }
+            unsigned int getTileIndex(std::string name)
+            {
+                if(dictionary.find(hashFunc(name, hash_bases[hash_base_index], 1000000007)) == dictionary.end())
+                {
+                    throw;
+                }
+                return dictionary[hashFunc(name, hash_bases[hash_base_index], 1000000007)];
+            }
             sf::Texture& getTexture(unsigned int index) //TODO: add error handling when reading out of bounds or from uninitialized spritesheet
             {
                 if(!loaded[index])
@@ -101,7 +109,11 @@ namespace m2d
             }
             sf::Texture& getTexture(std::string name)
             {
-                return getTexture(dictionary[hashFunc(name, hash_bases[hash_base_index], 1000000007)]);
+                return getTexture(getTileIndex(name));
+            }
+            bool inDictionary(std::string name)
+            {
+                return dictionary.find(hashFunc(name, hash_bases[hash_base_index], 1000000007)) != dictionary.end();
             }
     };
 }

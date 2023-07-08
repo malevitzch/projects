@@ -26,8 +26,10 @@ namespace m2d
             SpriteSheet(std::string image_file_name, sf::Vector2u _sprsize, std::string dictionary_file_name);
             sf::Vector2u getSize();
             sf::Vector2u getSprsize();
+            unsigned int getTileIndex(std::string name);
             sf::Texture& getTexture(unsigned int index);
             sf::Texture& getTexture(std::string name);
+            bool inDictionary(std::string name);
     };
 }
 #endif

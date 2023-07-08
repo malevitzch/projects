@@ -7,6 +7,7 @@
 #include <random>
 #include <chrono>
 #include <thread>
+#include <typeinfo>
 using namespace std::chrono_literals;
 namespace m2d
 {
@@ -57,7 +58,7 @@ namespace m2d
         }
         return out_res;
     }
-    struct qupdate //TODO: change qupdate so that it allows name-based updates, possibly through inheritance
+    struct qupdate
     {
         sf::Vector2u pos;
         unsigned int value;
@@ -87,9 +88,17 @@ namespace m2d
         {
             return rng();
         }
-        void addTask(qupdate qup)
+        void addTask(sf::Vector2u pos, unsigned int type_index)
         {
-            updates.push(qup);
+            updates.push({pos, type_index});
+        }
+        void addTask(sf::Vector2u pos, std::string type_name)
+        {
+            if(!(sprite_sheet->inDictionary(type_name)))
+            {
+                throw;
+            }
+            addTask(pos, sprite_sheet->getTileIndex(type_name));
         }
         PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos))
         {
@@ -109,7 +118,7 @@ namespace m2d
                 }
             }
             rng.seed(std::time(NULL));
-        } //TODO: add constructor that allows for the usage of a "named" spritesheet
+        }
         void init(std::vector<std::vector<unsigned int> > &initial_dish, unsigned int ms_tickrate)
         {
             dish_window = new sf::RenderWindow(sf::VideoMode(dimensions.x * sprite_sheet->getSprsize().x, dimensions.y * sprite_sheet->getSprsize().y), "PetriDish");
@@ -132,7 +141,7 @@ namespace m2d
                         dish_window->close();
                     }
                 }
-                for(Vector2u cur_tile : tiles)
+                for(sf::Vector2u cur_tile : tiles)
                 {
                     cellProc(cells[cur_tile.x][cur_tile.y], cur_tile);
                 }
@@ -144,7 +153,7 @@ namespace m2d
                 }
                 dish_window->clear();
                 std::shuffle(tiles.begin(), tiles.end(), rng);
-                for(Vector2u cur_tile : tiles)
+                for(sf::Vector2u cur_tile : tiles)
                 {
                     cell &c = cells[cur_tile.x][cur_tile.y];
                     c.sprite.setTexture(sprite_sheet->getTexture(c.tile_type));
