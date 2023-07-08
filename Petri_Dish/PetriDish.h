@@ -13,7 +13,10 @@ using std::vector;
 using sf::Vector2u;
 namespace m2d
 {
-    bool between(int in_x, int in_l, int in_r);
+    #ifndef BETWEEN
+    #define BETWEEN
+    template <typename T> bool between(T x, T l, T r);
+    #endif
     std::vector<sf::Vector2u> neighbours4(sf::Vector2u pos, sf::Vector2u dimensions);
     std::vector<sf::Vector2u> neighbours8(sf::Vector2u pos, sf::Vector2u dimensions);
     struct qupdate

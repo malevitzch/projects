@@ -12,7 +12,7 @@ namespace m2d
 {
     #ifndef BETWEEN
     #define BETWEEN
-    bool between(int x, int l, int r)
+    template <typename T> bool between(T x, T l, T r)
     {
         return ((x >= l) && (x <= r));
     }
@@ -22,11 +22,11 @@ namespace m2d
         std::vector<sf::Vector2u> out_res;
         for(int i = -1; i <= 1; i+=2)
         {
-            if(between(pos.x + i, 0, dimensions.x - 1))
+            if(between(pos.x + i, 0u, dimensions.x - 1))
             {
                 out_res.push_back({pos.x + i, pos.y});
             }
-            if(between(pos.y + i, 0, dimensions.y - 1))
+            if(between(pos.y + i, 0u, dimensions.y - 1))
             {
                 out_res.push_back({pos.x, pos.y + i});
             }
@@ -44,11 +44,11 @@ namespace m2d
                 {
                     continue;
                 }
-                if(!between(pos.x + i, 0, dimensions.x - 1))
+                if(!between(pos.x + i, 0u, dimensions.x - 1))
                 {
                     continue;
                 }
-                if(!between(pos.y + j, 0, dimensions.y - 1))
+                if(!between(pos.y + j, 0u, dimensions.y - 1))
                 {
                     continue;
                 }
