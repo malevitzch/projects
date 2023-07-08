@@ -11,38 +11,38 @@
 using namespace std::chrono_literals;
 using std::vector;
 using sf::Vector2u;
-namespace msim
+namespace m2d
 {
     bool between(int in_x, int in_l, int in_r);
-    vector<Vector2u> neighbours4(Vector2u pos, Vector2u dimensions);
-    vector<Vector2u> neighbours8(Vector2u pos, Vector2u dimensions);
+    std::vector<sf::Vector2u> neighbours4(sf::Vector2u pos, sf::Vector2u dimensions);
+    std::vector<sf::Vector2u> neighbours8(sf::Vector2u pos, sf::Vector2u dimensions);
     struct qupdate
     {
-        Vector2u pos;
+        sf::Vector2u pos;
         unsigned int value;
     };
     struct cell
     {
-        unsigned int tiletype;
+        unsigned int tile_type;
         sf::Sprite sprite;
     };
     class PetriDish
     {
     private:
-        vector<vector<cell> > cells;
-        vector<Vector2u> tiles;
-        m2d::SpriteSheet* spritesheet;
-        Vector2u dimensions;
+        std::vector<vector<cell> > cells;
+        std::vector<Vector2u> tiles;
+        SpriteSheet* sprite_sheet;
+        sf::Vector2u dimensions;
         std::queue<qupdate> updates;
-        sf::RenderWindow* dishwindow;
+        sf::RenderWindow* dish_window;
         std::mt19937 rng;
-        void (*cellproc)(cell in_c, Vector2u in_pos);
+        void (*cellProc)(cell c, sf::Vector2u pos);
     public:
-        cell& get_cell(Vector2u in_coords);
+        cell& getCell(sf::Vector2u coords);
         unsigned int randnum();
-        void addtask(qupdate in_qup);
-        PetriDish(std::string in_spritesheetname, Vector2u in_spritesize, Vector2u in_dimensions, void (*in_cellproc)(cell in_c, Vector2u in_pos)); //TODO: alternate constructor that allows for passing an existing spritesheet
-        void activate(vector<vector<unsigned int> > &initialdish, unsigned int in_mstickrate);
+        void addTask(qupdate qup);
+        PetriDish(std::string in_spritesheetname, sf::Vector2u in_spritesize, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos)); //TODO: alternate constructor that allows for passing an existing spritesheet
+        void init(std::vector<std::vector<unsigned int> > &initial_dish, unsigned int ms_tickrate);
     };
 }
 #endif

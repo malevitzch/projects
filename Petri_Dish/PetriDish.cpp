@@ -8,33 +8,34 @@
 #include <chrono>
 #include <thread>
 using namespace std::chrono_literals;
-using std::vector;
-using sf::Vector2u;
-namespace msim
+namespace m2d
 {
-    bool between(int in_x, int in_l, int in_r)
+    #ifndef BETWEEN
+    #define BETWEEN
+    bool between(int x, int l, int r)
     {
         return ((x >= l) && (x <= r));
     }
-    vector<Vector2u> neighbours4(Vector2u in_pos, Vector2u in_dimensions)
+    #endif
+    std::vector<sf::Vector2u> neighbours4(sf::Vector2u pos, sf::Vector2u dimensions)
     {
-        vector<Vector2u> out_res;
+        std::vector<sf::Vector2u> out_res;
         for(int i = -1; i <= 1; i+=2)
         {
-            if(between(in_pos.x + i, 0, in_dimensions.x - 1))
+            if(between(pos.x + i, 0, dimensions.x - 1))
             {
-                out_res.push_back({in_pos.x + i, in_pos.y});
+                out_res.push_back({pos.x + i, pos.y});
             }
-            if(between(in_pos.y + i, 0, in_dimensions.y - 1))
+            if(between(pos.y + i, 0, dimensions.y - 1))
             {
-                out_res.push_back({in_pos.x, in_pos.y + i});
+                out_res.push_back({pos.x, pos.y + i});
             }
         }
         return out_res;
     }
-    vector<Vector2u> neighbours8(Vector2u in_pos, Vector2u in_dimensions)
+    std::vector<sf::Vector2u> neighbours8(sf::Vector2u pos, sf::Vector2u dimensions)
     {
-        vector<Vector2u> out_res;
+        std::vector<sf::Vector2u> out_res;
         for(int i = -1; i <= 1; i++)
         {
             for(int j = -1; j <= 1; j++)
@@ -43,60 +44,60 @@ namespace msim
                 {
                     continue;
                 }
-                if(!between(in_pos.x + i, 0, in_dimensions.x - 1))
+                if(!between(pos.x + i, 0, dimensions.x - 1))
                 {
                     continue;
                 }
-                if(!between(in_pos.y + j, 0, in_dimensions.y - 1))
+                if(!between(pos.y + j, 0, dimensions.y - 1))
                 {
                     continue;
                 }
-                out_res.push_back({in_pos.x + i, in_pos.y + j});
+                out_res.push_back({pos.x + i, pos.y + j});
             }
         }
         return out_res;
     }
-    struct qupdate
+    struct qupdate //TODO: change qupdate so that it allows name-based updates, possibly through inheritance
     {
-        Vector2u pos;
+        sf::Vector2u pos;
         unsigned int value;
     };
     struct cell
     {
-        unsigned int tiletype;
+        unsigned int tile_type;
         sf::Sprite sprite;
     };
     class PetriDish
     {
     private:
-        vector<vector<cell> > cells;
-        vector<Vector2u> tiles;
-        m2d::SpriteSheet* spritesheet;
-        Vector2u dimensions;
+        std::vector<std::vector<cell> > cells;
+        std::vector<sf::Vector2u> tiles;
+        SpriteSheet* sprite_sheet;
+        sf::Vector2u dimensions;
         std::queue<qupdate> updates;
-        sf::RenderWindow* dishwindow;
+        sf::RenderWindow* dish_window;
         std::mt19937 rng;
-        void (*cellproc)(cell in_c, Vector2u in_pos);
+        void (*cellProc)(cell c, sf::Vector2u pos);
     public:
-        cell& get_cell(Vector2u in_coords)
+        cell& get_cell(sf::Vector2u coords)
         {
-            return cells[in_coords.x][in_coords.y];
+            return cells[coords.x][coords.y];
         }
         unsigned int randnum()
         {
             return rng();
         }
-        void addtask(qupdate in_qup)
+        void addTask(qupdate qup)
         {
-            updates.push(in_qup);
+            updates.push(qup);
         }
-        PetriDish(std::string in_spritesheetname, Vector2u in_spritesize, Vector2u in_dimensions, void (*in_cellproc)(cell in_c, Vector2u in_pos))
+        PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos))
         {
             dimensions = in_dimensions;
-            cellproc = in_cellproc;
-            spritesheet = new m2d::SpriteSheet(in_spritesheetname, in_spritesize);
+            cellProc = in_cellProc;
+            sprite_sheet = new SpriteSheet(sprite_sheet_name, in_spritesize);
             cells.resize(dimensions.x);
-            for(vector<cell> &cv : cells)
+            for(std::vector<cell> &cv : cells)
             {
                 cv.resize(dimensions.y);
             }
@@ -108,48 +109,49 @@ namespace msim
                 }
             }
             rng.seed(std::time(NULL));
-
-        }
-        void activate(vector<vector<unsigned int> > &in_initialdish, unsigned int in_mstickrate)
+        } //TODO: add constructor that allows for the usage of a "named" spritesheet
+        void init(std::vector<std::vector<unsigned int> > &initial_dish, unsigned int ms_tickrate)
         {
-            dishwindow = new sf::RenderWindow(sf::VideoMode(dimensions.x * spritesheet->getSprsize().x, dimensions.y * spritesheet->getSprsize().y), "PetriDish");
+            dish_window = new sf::RenderWindow(sf::VideoMode(dimensions.x * sprite_sheet->getSprsize().x, dimensions.y * sprite_sheet->getSprsize().y), "PetriDish");
             for(unsigned int i = 0; i < dimensions.x; i++)
             {
                 for(unsigned int j = 0; j < dimensions.y; j++)
                 {
-                    cells[i][j].tiletype = in_initialdish[i][j];
-                    cells[i][j].sprite.setPosition({(float)(1) * i * spritesheet->getSprsize().x, (float)(1) * j * spritesheet->getSprsize().y});
-                    cells[i][j].sprite.setTexture(spritesheet->getTexture(cells[i][j].tiletype));
+                    cells[i][j].tile_type = initial_dish[i][j];
+                    cells[i][j].sprite.setPosition({(float)(1) * i * sprite_sheet->getSprsize().x, (float)(1) * j * sprite_sheet->getSprsize().y});
+                    cells[i][j].sprite.setTexture(sprite_sheet->getTexture(cells[i][j].tile_type));
                 }
             }
-            while(dishwindow->isOpen())
+            while(dish_window->isOpen())
             {
                 sf::Event event;
-                while (dishwindow->pollEvent(event))
+                while(dish_window->pollEvent(event))
                 {
                     if (event.type == sf::Event::Closed)
-                        dishwindow->close();
+                    {
+                        dish_window->close();
+                    }
                 }
-                for(Vector2u t_curtile : tiles)
+                for(Vector2u cur_tile : tiles)
                 {
-                    cellproc(cells[t_curtile.x][t_curtile.y], t_curtile);
+                    cellProc(cells[cur_tile.x][cur_tile.y], cur_tile);
                 }
                 while(!updates.empty())
                 {
-                    cell &t_c = cells[updates.front().pos.x][updates.front().pos.y];
-                    t_c.tiletype = updates.front().value;
+                    cell &c = cells[updates.front().pos.x][updates.front().pos.y];
+                    c.tile_type = updates.front().value;
                     updates.pop();
                 }
-                dishwindow->clear();
+                dish_window->clear();
                 std::shuffle(tiles.begin(), tiles.end(), rng);
-                for(Vector2u curtile : tiles)
+                for(Vector2u cur_tile : tiles)
                 {
-                    cell &t_c = cells[curtile.x][curtile.y];
-                    t_c.sprite.setTexture(spritesheet->getTexture(t_c.tiletype));
-                    dishwindow->draw(t_c.sprite);
+                    cell &c = cells[cur_tile.x][cur_tile.y];
+                    c.sprite.setTexture(sprite_sheet->getTexture(c.tile_type));
+                    dish_window->draw(c.sprite);
                 }
-                dishwindow->display();
-                std::this_thread::sleep_for(in_ms_tickrate * 1ms);
+                dish_window->display();
+                std::this_thread::sleep_for(ms_tickrate * 1ms);
             }
 
         }
