@@ -5,7 +5,7 @@
 #include <fstream>
 namespace m2d
 {
-    unsigned long long hashFunc(std::string to_hash, unsigned long long hash_base, unsigned long long hash_mod)
+    unsigned long long hashFunc(std::string to_hash, unsigned long long hash_base, unsigned long long hash_mod) //plain old polynomial hash function that hashes strings
     {
         unsigned long long cur_hash = 0;
         for(char c : to_hash)
@@ -30,6 +30,7 @@ namespace m2d
             void loadTexture(unsigned int index)
             {
                 loaded[index] = true;
+                //using math to determine the position of the texture in the sheet image
                 unsigned int columns = sheet.getSize().x / sprite_size.x;
                 unsigned int column = index % columns;
                 unsigned int row = index / columns;
@@ -44,6 +45,8 @@ namespace m2d
                 {
                     names.push_back(in);
                 }
+                //we iterate through five potential hash bases until we find one that will cause no hash collisions
+                //with a 1e9 + 7 modulo and 5 tries the chances of not getting a collisionless initialisation are abysmal
                 for(unsigned int cur_base : hash_bases)
                 {
                     unsigned int counter = 0;
@@ -57,7 +60,7 @@ namespace m2d
                             is_collision = true;
                             break;
                         }
-                        dictionary.insert({word_hash, counter});
+                        dictionary.insert({word_hash, counter}); //we insert the hashes into a map that later allows us to get the tile by name using getTileIndex
                         counter++;
                     }
                     if(!is_collision)
@@ -69,6 +72,7 @@ namespace m2d
             }
             void objectInit(std::string file_name, sf::Vector2u sprsize)
             {
+                //base initialisation of a SpriteSheet
                 sheet.loadFromFile(file_name);
                 sprite_size = sprsize;
                 sprite_count = (sheet.getSize().x / sprite_size.x) * (sheet.getSize().y / sprite_size.y);
@@ -99,12 +103,17 @@ namespace m2d
             {
                 if(dictionary.find(hashFunc(name, hash_bases[hash_base_index], 1000000007)) == dictionary.end())
                 {
+                    //throw an exception in case we try to access a tile that doesn't exist
+                    //perhaps try catch would be a better idea here so that we don't have to crash the program
+                    std::cerr<<"unknown tile name"<<std::endl;
                     throw;
                 }
                 return dictionary[hashFunc(name, hash_bases[hash_base_index], 1000000007)];
             }
             sf::Texture& getTexture(unsigned int index) //TODO: add error handling when reading out of bounds or from uninitialized spritesheet
             {
+                //this kind of implementation should give a performance boost in case of larger spritesheets as we don't have to load all the textures instantly
+                //perhaps we could make textures a vector of pointers instead though, in order to save memory
                 if(!loaded[index])
                 {
                     loadTexture(index);
@@ -121,6 +130,7 @@ namespace m2d
                 {
                     std::cerr<<"accessing tile out of bounds"<<std::endl;
                     throw;
+                    //again, catch not throw, TODO
                 }
                 return names[index];
             }
