@@ -1,17 +1,18 @@
 #include "PetriDish.h"
 #include <bits/stdc++.h>
 m2d::PetriDish* game_dish;
+m2d::SpriteSheet* new_sprite_sheet;
 void conwaysProc(m2d::cell c, sf::Vector2u pos)
 {
     int live_neighbours = 0;
     for(sf::Vector2u cur_cell: m2d::neighbours8(pos, {32, 32}))
     {
-        if(game_dish->getCell(cur_cell).tile_type == 1)
+        if(new_sprite_sheet->getName(game_dish->getCell(cur_cell).tile_type) == "ALIVE")
         {
             live_neighbours++;
         }
     }
-    if(c.tile_type == 1)
+    if(new_sprite_sheet->getName(c.tile_type) == "ALIVE")
     {
         if(!m2d::between(live_neighbours, 2, 3))
         {
@@ -28,7 +29,7 @@ void conwaysProc(m2d::cell c, sf::Vector2u pos)
 }
 int main()
 {
-    m2d::SpriteSheet* new_sprite_sheet = new m2d::SpriteSheet("Assets.png", {16, 16}, "names");
+    new_sprite_sheet = new m2d::SpriteSheet("Assets.png", {16, 16}, "names");
     game_dish = new m2d::PetriDish(new_sprite_sheet, {32, 32}, conwaysProc);
     std::vector<std::vector<unsigned int> > initial_dish;
     initial_dish.resize(32);
