@@ -1,0 +1,2 @@
+PetriDish is a class that allows for simple cell-based simulations.
+An example of such can be seen in ConwaysGameOfLife.cpp

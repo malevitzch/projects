@@ -7,7 +7,7 @@ void conwaysProc(m2d::cell c, sf::Vector2u pos)
     int live_neighbours = 0;
     for(sf::Vector2u cur_cell: m2d::neighbours8(pos, {32, 32}))
     {
-        if(new_sprite_sheet->getName(game_dish->getCell(cur_cell).tile_type) == "ALIVE")
+        if(game_dish->getName(game_dish->getCell(cur_cell).tile_type) == "ALIVE")
         {
             live_neighbours++;
         }

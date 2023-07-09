@@ -180,6 +180,10 @@ namespace m2d
             }
 
         }
+        std::string getName(unsigned int index)
+        {
+            return sprite_sheet->getName(index);
+        }
     };
 }
 #endif

@@ -26,6 +26,7 @@ namespace m2d
             unsigned int hash_base_index = 0;
             std::vector<unsigned int> hash_bases = {733, 739, 743, 751, 757};
             std::map<unsigned long long, int> dictionary;
+            std::vector<std::string> names;
             void loadTexture(unsigned int index)
             {
                 loaded[index] = true;
@@ -37,7 +38,6 @@ namespace m2d
             }
             void initDictionary(std::string dictionary_file_name)
             {
-                std::vector<std::string> names;
                 std::string in;
                 std::ifstream dictionary_input(dictionary_file_name);
                 while(dictionary_input>>in)
@@ -114,6 +114,15 @@ namespace m2d
             sf::Texture& getTexture(std::string name)
             {
                 return getTexture(getTileIndex(name));
+            }
+            std::string getName(unsigned int index)
+            {
+                if(index >= names.size())
+                {
+                    std::cerr<<"accessing tile out of bounds"<<std::endl;
+                    throw;
+                }
+                return names[index];
             }
             bool inDictionary(std::string name)
             {

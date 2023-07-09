@@ -50,6 +50,7 @@ namespace m2d
         PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos));
         PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, std::string in_dictionary_name, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos))
         void init(std::vector<std::vector<unsigned int> > &initial_dish, unsigned int ms_tickrate);
+        std::string getName(unsigned int index);
     };
 }
 #endif
