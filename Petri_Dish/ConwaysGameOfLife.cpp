@@ -1,36 +1,34 @@
 #include "PetriDish.h"
 #include <bits/stdc++.h>
-m2d::PetriDish* game_dish;
-m2d::SpriteSheet* new_sprite_sheet;
-void conwaysProc(m2d::cell c, sf::Vector2u pos)
+void conwaysProc(m2d::cell c, sf::Vector2u pos, m2d::PetriDish* dish)
 {
     int live_neighbours = 0;
     for(sf::Vector2u cur_cell: m2d::neighbours8(pos, {32, 32}))
     {
-        if(game_dish->getName(game_dish->getCell(cur_cell).tile_type) == "ALIVE")
+        if(dish->getName(dish->getCell(cur_cell).tile_type) == "ALIVE")
         {
             live_neighbours++;
         }
     }
-    if(new_sprite_sheet->getName(c.tile_type) == "ALIVE")
+    if(dish->getName(c.tile_type) == "ALIVE")
     {
         if(!m2d::between(live_neighbours, 2, 3))
         {
-            game_dish->addTask(pos, "DEAD");
+            dish->addTask(pos, "DEAD");
         }
     }
     else
     {
         if(live_neighbours == 3)
         {
-            game_dish->addTask(pos, "ALIVE");
+            dish->addTask(pos, "ALIVE");
         }
     }
 }
 int main()
 {
-    new_sprite_sheet = new m2d::SpriteSheet("Assets.png", {16, 16}, "names");
-    game_dish = new m2d::PetriDish(new_sprite_sheet, {32, 32}, conwaysProc);
+    m2d::SpriteSheet* new_sprite_sheet = new m2d::SpriteSheet("Assets.png", {16, 16}, "names");
+    m2d::PetriDish* game_dish = new m2d::PetriDish(new_sprite_sheet, {32, 32}, conwaysProc);
     std::vector<std::vector<unsigned int> > initial_dish;
     initial_dish.resize(32);
     for(std::vector<unsigned int> &cur_vec : initial_dish)

@@ -78,8 +78,8 @@ namespace m2d
         std::queue<qupdate> updates;
         sf::RenderWindow* dish_window;
         std::mt19937 rng;
-        void (*cellProc)(cell c, sf::Vector2u pos);
-        void objectInit(SpriteSheet *in_sprite_sheet, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos))
+        void (*cellProc)(cell c, sf::Vector2u pos, PetriDish* dish);
+        void objectInit(SpriteSheet *in_sprite_sheet, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos, PetriDish* dish))
         {
             dimensions = in_dimensions;
             cellProc = in_cellProc;
@@ -119,16 +119,16 @@ namespace m2d
             }
             addTask(pos, sprite_sheet->getTileIndex(type_name));
         }
-        PetriDish(SpriteSheet* in_sprite_sheet, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos))
+        PetriDish(SpriteSheet* in_sprite_sheet, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos, PetriDish* dish))
         {
             objectInit(in_sprite_sheet, in_dimensions, in_cellProc);
         }
-        PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos))
+        PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos, PetriDish* dish))
         {
             SpriteSheet* new_sprite_sheet = new SpriteSheet(sprite_sheet_name, in_spritesize);
             objectInit(new_sprite_sheet, in_dimensions, in_cellProc);
         }
-        PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, std::string in_dictionary_name, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos))
+        PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, std::string in_dictionary_name, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos, PetriDish* dish))
         {
             SpriteSheet* new_sprite_sheet = new SpriteSheet(sprite_sheet_name, in_spritesize, in_dictionary_name);
             objectInit(new_sprite_sheet, in_dimensions, in_cellProc);
@@ -166,7 +166,7 @@ namespace m2d
                 dish_window->display();
                 for(sf::Vector2u cur_tile : tiles)
                 {
-                    cellProc(cells[cur_tile.x][cur_tile.y], cur_tile);
+                    cellProc(cells[cur_tile.x][cur_tile.y], cur_tile, this);
                 }
 
                 while(!updates.empty())

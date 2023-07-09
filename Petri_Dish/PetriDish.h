@@ -40,15 +40,15 @@ namespace m2d
         std::queue<qupdate*> updates;
         sf::RenderWindow* dish_window;
         std::mt19937 rng;
-        void (*cellProc)(cell c, sf::Vector2u pos);
-        void objectInit(SpriteSheet* in_sprite_sheet, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos));
+        void (*cellProc)(cell c, sf::Vector2u pos, PetriDish* dish);
+        void objectInit(SpriteSheet* in_sprite_sheet, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos, PetriDish* dish));
     public:
         cell& getCell(sf::Vector2u coords);
         unsigned int randnum();
         void addTask(qupdate qup);
         PetriDish(SpriteSheet *in_sprite_sheet, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos));
-        PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos));
-        PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, std::string in_dictionary_name, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos))
+        PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos, PetriDish* dish));
+        PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, std::string in_dictionary_name, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos, PetriDish* dish))
         void init(std::vector<std::vector<unsigned int> > &initial_dish, unsigned int ms_tickrate);
         std::string getName(unsigned int index);
     };
