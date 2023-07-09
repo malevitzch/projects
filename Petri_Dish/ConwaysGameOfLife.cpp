@@ -3,6 +3,7 @@
 void conwaysProc(m2d::cell c, sf::Vector2u pos, m2d::PetriDish* dish)
 {
     int live_neighbours = 0;
+    //count 'alive' neighbours
     for(sf::Vector2u cur_cell: m2d::neighbours8(pos, {32, 32}))
     {
         if(dish->getName(dish->getCell(cur_cell).tile_type) == "ALIVE")
@@ -12,6 +13,7 @@ void conwaysProc(m2d::cell c, sf::Vector2u pos, m2d::PetriDish* dish)
     }
     if(dish->getName(c.tile_type) == "ALIVE")
     {
+        //an alive cell survives if it has 2 or 3 neighbours
         if(!m2d::between(live_neighbours, 2, 3))
         {
             dish->addTask(pos, "DEAD");
@@ -19,6 +21,7 @@ void conwaysProc(m2d::cell c, sf::Vector2u pos, m2d::PetriDish* dish)
     }
     else
     {
+        //a new cell is created if there are exactly 3 neighbours
         if(live_neighbours == 3)
         {
             dish->addTask(pos, "ALIVE");
@@ -35,6 +38,7 @@ int main()
     {
         cur_vec.resize(32, 0);
     }
+    //creating the inital pattern
     initial_dish[12][16] = 1;
     initial_dish[13][16] = 1;
     initial_dish[13][17] = 1;

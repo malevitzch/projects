@@ -7,10 +7,11 @@
 #include <random>
 #include <chrono>
 #include <thread>
-#include <typeinfo>
 using namespace std::chrono_literals;
 namespace m2d
 {
+    //the ifndef is a temporary solution until I get enough util functions to put them all in a util library
+    //for now the function is just pasted wherever needed and has an include guard to avoid conflicts
     #ifndef BETWEEN
     #define BETWEEN
     template <typename T> bool between(T x, T l, T r)
@@ -21,6 +22,7 @@ namespace m2d
     std::vector<sf::Vector2u> neighbours4(sf::Vector2u pos, sf::Vector2u dimensions)
     {
         std::vector<sf::Vector2u> out_res;
+        //add all pairs of coordiantes that are not out of bounds and have exactly one coordinate changed by +-1
         for(int i = -1; i <= 1; i+=2)
         {
             if(between(pos.x + i, 0u, dimensions.x - 1))
@@ -41,7 +43,7 @@ namespace m2d
         {
             for(int j = -1; j <= 1; j++)
             {
-                if(i == 0 && j == 0)
+                if(i == 0 && j == 0) //we only want neighbours, not the tile itself
                 {
                     continue;
                 }
@@ -81,14 +83,18 @@ namespace m2d
         void (*cellProc)(cell c, sf::Vector2u pos, PetriDish* dish);
         void objectInit(SpriteSheet *in_sprite_sheet, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos, PetriDish* dish))
         {
+            //basic initialization
             dimensions = in_dimensions;
             cellProc = in_cellProc;
             sprite_sheet = in_sprite_sheet;
+            //initializing a matrix of cells
             cells.resize(dimensions.x);
             for(std::vector<cell> &cv : cells)
             {
                 cv.resize(dimensions.y);
             }
+            //initializing the tiles, could be done without tiles altogether and just a single for loop
+            //but I wanted them to be processed in random order in case I ever want to do something that cares about order in which cellProc is called on the cells
             for(unsigned int i = 0; i < dimensions.x; i++)
             {
                 for(unsigned int j = 0; j < dimensions.y; j++)
@@ -109,15 +115,17 @@ namespace m2d
         }
         void addTask(sf::Vector2u pos, unsigned int type_index)
         {
+            //add an update to the update queue which will is resolved at the end of every phase
             updates.push({pos, type_index});
         }
         void addTask(sf::Vector2u pos, std::string type_name)
         {
             if(!(sprite_sheet->inDictionary(type_name)))
             {
-                throw;
+                throw; //throw an error in case the name is not known to the dictionary
+                //again, the error should be caught instead
             }
-            addTask(pos, sprite_sheet->getTileIndex(type_name));
+            addTask(pos, sprite_sheet->getTileIndex(type_name)); //we just change the name-based addTask function to a simple call of the index-based one
         }
         PetriDish(SpriteSheet* in_sprite_sheet, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos, PetriDish* dish))
         {
@@ -135,7 +143,8 @@ namespace m2d
         }
         void init(std::vector<std::vector<unsigned int> > &initial_dish, unsigned int ms_tickrate)
         {
-            dish_window = new sf::RenderWindow(sf::VideoMode(dimensions.x * sprite_sheet->getSprsize().x, dimensions.y * sprite_sheet->getSprsize().y), "PetriDish");
+            dish_window = new sf::RenderWindow(sf::VideoMode(dimensions.x * sprite_sheet->getSprsize().x, dimensions.y * sprite_sheet->getSprsize().y), "PetriDish"); //create the window
+            //fill the cells with proper
             for(unsigned int i = 0; i < dimensions.x; i++)
             {
                 for(unsigned int j = 0; j < dimensions.y; j++)
@@ -145,18 +154,22 @@ namespace m2d
                     cells[i][j].sprite.setTexture(sprite_sheet->getTexture(cells[i][j].tile_type));
                 }
             }
+            //main loop of the PetriDish
             while(dish_window->isOpen())
             {
+                //handle sfml events, close the window if the 'x' in the right top corner is pressed
                 sf::Event event;
                 while(dish_window->pollEvent(event))
                 {
 
-                    if (event.type == sf::Event::Closed)
+                    if(event.type == sf::Event::Closed)
                     {
                         dish_window->close();
                     }
                 }
+                //draw the cells on the screen
                 dish_window->clear();
+                std::shuffle(tiles.begin(), tiles.end(), rng);
                 for(sf::Vector2u cur_tile : tiles)
                 {
                     cell &c = cells[cur_tile.x][cur_tile.y];
@@ -164,19 +177,19 @@ namespace m2d
                     dish_window->draw(c.sprite);
                 }
                 dish_window->display();
+                //call cellProc for each of the tiles
                 for(sf::Vector2u cur_tile : tiles)
                 {
                     cellProc(cells[cur_tile.x][cur_tile.y], cur_tile, this);
                 }
-
+                //apply the changes queued by the addTask function
                 while(!updates.empty())
                 {
                     cell &c = cells[updates.front().pos.x][updates.front().pos.y];
                     c.tile_type = updates.front().value;
                     updates.pop();
                 }
-                std::shuffle(tiles.begin(), tiles.end(), rng);
-                std::this_thread::sleep_for(ms_tickrate * 1ms);
+                std::this_thread::sleep_for(ms_tickrate * 1ms); //I should probably measure the time from last frame and subtract it and make the rendering in a different thread to make the tickspeed consistent
             }
 
         }
