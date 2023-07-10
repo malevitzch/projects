@@ -125,8 +125,7 @@ namespace m2d
             }
             sf::Texture& getTexture(unsigned int index) //TODO: add error handling when reading out of bounds or from uninitialized spritesheet
             {
-                //this kind of implementation should give a performance boost in case of larger spritesheets as we don't have to load all the textures instantly
-                //perhaps we could make textures a vector of pointers instead though, in order to save memory
+                //this kind of implementation should give a performance boost in case of larger spritesheets as we don't have to load all the textures instantly, only loading when they are needed
                 if(!loaded[index])
                 {
                     loadTexture(index);
