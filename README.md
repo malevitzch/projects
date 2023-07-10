@@ -4,7 +4,5 @@ Details of each project are included in an "ABOUT" file in the respective folder
 It is important to note that some project might be depended upon others so moving the files is not advised (many things rely on Spritesheet_Lib)
 
 # TODO
-- [ ] Add ABOUT file to Petri_Dish
-- [ ] Isometric Renderer
-- [ ] Add documentation to header files
+- [ ] Isometric Renderer project
 - [ ] Word mistyping project
