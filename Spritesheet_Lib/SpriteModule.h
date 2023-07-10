@@ -19,6 +19,7 @@ namespace m2d
             std::vector<unsigned int> hash_bases;
             std::map<unsigned long long, int> dictionary;
             std::vector<std::string> names;
+            unsigned int error_tile_index;
             void loadTexture(unsigned int index);
             void initDictionary(std::string dictionary_file_name);
             void objectInit(std::string file_name, sf::Vector2u sprsize);
@@ -33,6 +34,7 @@ namespace m2d
             sf::Texture& getTexture(std::string name); //returns the tile texture of the chosen name
             std::string getName(unsigned int index); //returns the name of the tile with the chosen index
             bool inDictionary(std::string name); //checks whether a name is already inside the dictionary
+            void setErrorTileIndex(unsigned int index); //sets the tile which will be returned in case of tile fetching errors, default is 0
     };
 }
 #endif

@@ -27,6 +27,7 @@ namespace m2d
             std::vector<unsigned int> hash_bases = {733, 739, 743, 751, 757};
             std::map<unsigned long long, int> dictionary;
             std::vector<std::string> names;
+            unsigned int error_tile_index = 0;
             void loadTexture(unsigned int index)
             {
                 loaded[index] = true;
@@ -75,6 +76,11 @@ namespace m2d
                 //base initialisation of a SpriteSheet
                 sheet.loadFromFile(file_name);
                 sprite_size = sprsize;
+                if(sheet.getSize().x % sprite_size.x != 0 && sheet.getSize().y % sprite_size.y != 0)
+                {
+                    printf("the spritesheet needs to be evenly divided into tiles\n");
+                    throw;
+                }
                 sprite_count = (sheet.getSize().x / sprite_size.x) * (sheet.getSize().y / sprite_size.y);
                 textures.resize(sprite_count);
                 loaded.resize(sprite_count);
@@ -101,14 +107,19 @@ namespace m2d
             }
             unsigned int getTileIndex(std::string name)
             {
-                if(dictionary.find(hashFunc(name, hash_bases[hash_base_index], 1000000007)) == dictionary.end())
+                //throw an exception in case we try to access a tile that doesn't exist
+                //perhaps try catch would be a better idea here so that we don't have to crash the program
+                unsigned int out_ans = 0;
+                try
                 {
-                    //throw an exception in case we try to access a tile that doesn't exist
-                    //perhaps try catch would be a better idea here so that we don't have to crash the program
-                    std::cerr<<"unknown tile name"<<std::endl;
-                    throw;
+                    out_ans = dictionary.at(hashFunc(name, hash_bases[hash_base_index], 1000000007)); //the map::at function throws an exception in case of non-existent key
                 }
-                return dictionary[hashFunc(name, hash_bases[hash_base_index], 1000000007)];
+                catch(...)
+                {
+                    printf("unknown tile name \"%s\" \n", name.c_str()); //output the tile name that caused the error
+                    out_ans = error_tile_index;
+                }
+                return out_ans;
             }
             sf::Texture& getTexture(unsigned int index) //TODO: add error handling when reading out of bounds or from uninitialized spritesheet
             {
@@ -126,17 +137,31 @@ namespace m2d
             }
             std::string getName(unsigned int index)
             {
-                if(index >= names.size())
+                std::string out_ans;
+                try
                 {
-                    std::cerr<<"accessing tile out of bounds"<<std::endl;
-                    throw;
-                    //again, catch not throw, TODO
+                    out_ans = names.at(index); //the at function throws an out_of_range exception in case of too high index
                 }
-                return names[index];
+                catch(...)
+                {
+                    printf("accessing name out of bounds, attempting to get %u, max index is %u\n", index, (unsigned int)(names.size()) - 1u);
+                    out_ans = getName(error_tile_index);
+                }
+                return out_ans;
             }
             bool inDictionary(std::string name)
             {
                 return dictionary.find(hashFunc(name, hash_bases[hash_base_index], 1000000007)) != dictionary.end();
+            }
+            void setErrorTileIndex(unsigned int index)
+            {
+                //preventing setting invalid error_tile_index
+                if(index >= sprite_count)
+                {
+                    printf("%u is not a valid tile index\n", index);
+                    return;
+                }
+                error_tile_index = index;
             }
     };
 }

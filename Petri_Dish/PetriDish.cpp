@@ -120,11 +120,6 @@ namespace m2d
         }
         void addTask(sf::Vector2u pos, std::string type_name)
         {
-            if(!(sprite_sheet->inDictionary(type_name)))
-            {
-                throw; //throw an error in case the name is not known to the dictionary
-                //again, the error should be caught instead
-            }
             addTask(pos, sprite_sheet->getTileIndex(type_name)); //we just change the name-based addTask function to a simple call of the index-based one
         }
         PetriDish(SpriteSheet* in_sprite_sheet, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos, PetriDish* dish))
