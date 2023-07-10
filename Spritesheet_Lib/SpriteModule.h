@@ -10,10 +10,10 @@ namespace m2d
     class SpriteSheet
     {
         private:
-            Vector2u sprite_size;
-            Image sheet;
+            sf::Vector2u sprite_size;
+            sf::Image sheet;
             unsigned int sprite_count;
-            std::vector<Texture> textures;
+            std::vector<sf::Texture*> textures;
             std::vector<bool> loaded;
             unsigned int hash_base_index;
             std::vector<unsigned int> hash_bases;

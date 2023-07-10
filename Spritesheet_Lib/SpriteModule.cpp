@@ -21,7 +21,7 @@ namespace m2d
             sf::Vector2u sprite_size;
             sf::Image sheet;
             unsigned int sprite_count;
-            std::vector<sf::Texture> textures;
+            std::vector<sf::Texture*> textures;
             std::vector<bool> loaded;
             unsigned int hash_base_index = 0;
             std::vector<unsigned int> hash_bases = {733, 739, 743, 751, 757};
@@ -36,7 +36,9 @@ namespace m2d
                 unsigned int column = index % columns;
                 unsigned int row = index / columns;
                 unsigned int x(index * sprite_size.x), y(row * sprite_size.y);
-                textures[index].loadFromImage(sheet, sf::IntRect(x, y, sprite_size.x, sprite_size.y));
+                sf::Texture* new_texture = new sf::Texture();
+                new_texture->loadFromImage(sheet, sf::IntRect(x, y, sprite_size.x, sprite_size.y));
+                textures[index] = new_texture;
             }
             void initDictionary(std::string dictionary_file_name)
             {
@@ -129,7 +131,7 @@ namespace m2d
                 {
                     loadTexture(index);
                 }
-                return textures[index];
+                return *(textures[index]);
             }
             sf::Texture& getTexture(std::string name)
             {
