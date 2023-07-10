@@ -51,6 +51,8 @@ namespace m2d
         PetriDish(std::string sprite_sheet_name, sf::Vector2u in_spritesize, std::string in_dictionary_name, sf::Vector2u in_dimensions, void (*in_cellProc)(cell c, sf::Vector2u pos, PetriDish* dish))
         void init(std::vector<std::vector<unsigned int> > &initial_dish, unsigned int ms_tickrate); //function used to initialize the dish, takes a matrix that specifies the starting states of cells and a tickrate value in miliseconds as input
         std::string getName(unsigned int index); //returns the name of tile with chosen index
+        void setErrorTileIndex(unsigned int index); //sets sprite_sheet's tile which will be returned in case of tile fetching errors, default is 0
+
     };
 }
 #endif

@@ -192,6 +192,10 @@ namespace m2d
         {
             return sprite_sheet->getName(index);
         }
+        void setErrorTileIndex(unsigned int index)
+        {
+            sprite_sheet->setErrorTileIndex(index);
+        }
     };
 }
 #endif
