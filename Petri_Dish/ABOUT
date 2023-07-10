@@ -1,2 +1,3 @@
 PetriDish is a class that allows for simple cell-based simulations.
+To use, create a PetriDish object and call the init function.
 An example of such can be seen in ConwaysGameOfLife.cpp
