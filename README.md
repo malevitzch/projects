@@ -6,3 +6,4 @@ It is important to note that some project might be depended upon others so movin
 # TODO
 - [ ] Isometric Renderer project
 - [ ] Word mistyping project
+- [ ] Change methods to const
