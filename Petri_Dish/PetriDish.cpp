@@ -188,7 +188,7 @@ namespace m2d
             }
 
         }
-        std::string getName(unsigned int index)
+        std::string getName(unsigned int index) const
         {
             return sprite_sheet->getName(index);
         }

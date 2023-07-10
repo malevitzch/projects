@@ -97,15 +97,15 @@ namespace m2d
                 objectInit(image_file_name, in_sprsize);
                 initDictionary(dictionary_file_name);
             }
-            sf::Vector2u getSize()
+            sf::Vector2u getSize() const
             {
                 return sheet.getSize();
             }
-            sf::Vector2u getSprsize()
+            sf::Vector2u getSprsize() const
             {
                 return sprite_size;
             }
-            unsigned int getTileIndex(std::string name)
+            unsigned int getTileIndex(std::string name) const
             {
                 //throw an exception in case we try to access a tile that doesn't exist
                 //perhaps try catch would be a better idea here so that we don't have to crash the program
@@ -135,7 +135,7 @@ namespace m2d
             {
                 return getTexture(getTileIndex(name));
             }
-            std::string getName(unsigned int index)
+            std::string getName(unsigned int index) const
             {
                 std::string out_ans;
                 try
