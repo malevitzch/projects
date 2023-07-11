@@ -1,25 +1,38 @@
 #include <iostream>
-
-class isotile
+#include <SFML/Graphics.hpp>
+namespace m2d
 {
-private:
-    int x, y, z;
-    int sigma() const
+    class IsoTexture
     {
-        return x + y;
-    }
-    int delta() const
+    private:
+        sf::Texture texture;
+        sf::Vector2u sprite_size;
+        unsigned int height;
+    public:
+
+    };
+    class Isotile
     {
-        return x - y;
-    }
-public:
-    bool operator<(const isotile &compare_isotile)
-    {
-        //sigma determines the "row" that the tile is in, colum
-        if(this->sigma() == compare_isotile.sigma())
+    private:
+        int x, y, z;
+        IsoTexture& texture;
+        int sigma() const
         {
-            return this->z < compare_isotile.z;
+            return x + y;
         }
-        return this->sigma() > compare_isotile.sigma();
-    }
-};
+        int delta() const
+        {
+            return x - y;
+        }
+    public:
+        bool operator<(const isotile &compare_isotile)
+        {
+            //sigma determines the "row" that the tile is in, colum
+            if(this->sigma() == compare_isotile.sigma())
+            {
+                return this->z < compare_isotile.z;
+            }
+            return this->sigma() > compare_isotile.sigma();
+        }
+    };
+}
