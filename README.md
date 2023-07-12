@@ -7,3 +7,4 @@ It is important to note that some project might be depended upon others so movin
 - [ ] Isometric Renderer project
 - [ ] Word mistyping project
 - [ ] Change methods to const
+- [ ] Add an option to have more updates between each graphic update to allow for faster simulations
